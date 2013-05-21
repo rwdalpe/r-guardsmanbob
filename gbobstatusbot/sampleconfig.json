@@ -1,0 +1,18 @@
+{
+    "UserAgent" : "",
+    "Username" : "",
+    "Password" : "", 
+    "StreamStatusBot": {
+        "StreamName" : "",
+        "Subreddit" : "",
+        "UpdateInterval" : 10.0
+    },
+    "FlairBot": {
+        "Subreddit" : "",
+        "Mapping": {
+            "Don't Starve" : "ds",
+            "Boblight" : "lol"
+        },
+        "UpdateInterval" : 3600.0
+    }
+}
