@@ -59,4 +59,4 @@ Usage
 
 The bot can be used by running 
 
-`python boy.py`
+`python bot.py`
