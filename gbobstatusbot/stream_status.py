@@ -4,9 +4,26 @@ import logging
 import urllib
 import socket
 import http.client
+import re
 
 
-def change_sidebar_text(desc, live):
+def change_sidebar_playing(desc, playing):
+    """Change sidebar text to reflect the currently played game
+    
+    Args:
+        desc: A string representation of sidebar text
+        playing: A string representation of the currently played game
+    
+    Returns:
+        A string representation of sidebar text that properly represents the
+        currently played game
+    
+    """
+    match = re.search(r'\[.*\]', playing)
+    new_game = match.group(0)
+    desc = re.sub(r'\[.*\]', new_game, desc, 1)
+    return desc
+def change_sidebar_stream_status(desc, live):
     """Change sidebar text with updated stream information
     
     Args:
@@ -25,7 +42,7 @@ def change_sidebar_text(desc, live):
     return desc
 
 
-def is_stream_live(stream_name):
+def get_stream_details(stream_name):
     """Determine if a twitch.tv stream is online.
     
     Args:
@@ -60,13 +77,37 @@ def is_stream_live(stream_name):
             body = json.loads(jbody)
             if(body != None):
                 twitch.close()
-                return (('stream' in body) and (type(body['stream']) is dict))
+                if(('stream' in body) and (type(body['stream']) is dict)):
+                    stream = body['stream']
+                    if(('channel' in stream) and 
+                       (type(stream['channel']) is dict)):
+                        return stream['channel']
+                else:
+                    return None
+            logging.warning("problem with stream JSON")
+            return -1
         else:
             logging.warning("non 200 status: %d" % twitch.status)
             return -1
 
 
-def update_sidebar(reddit, sub_name, stream_name, current_stream_status):
+def is_stream_online(stream_obj):
+    return stream_obj is not None
+
+
+def which_game_playing(stream_obj):
+    return stream_obj['status']
+
+
+def should_update_sidebar(old_stream_status, new_stream_status, old_game, 
+                          new_game):
+    return ((old_stream_status is None or old_game is None) or 
+            old_stream_status != new_stream_status or 
+            old_game != new_game)
+
+
+def update_sidebar(reddit, sub_name, stream_name, current_stream_status, 
+                   current_game):
     """Update a subreddit's sidebar text.
     
     Args:
@@ -76,45 +117,15 @@ def update_sidebar(reddit, sub_name, stream_name, current_stream_status):
         stream_name: A string representation of a twitch.tv stream's name
         current_stream_status: A boolean value representing if the stream is
             currently known to be online.
+        current_game: A string representation of the game currently being played
     
     """
     logging.info("Updating sidebar for subreddit %s and stream %s" 
                  % (sub_name, stream_name))
     sub = reddit.get_subreddit(sub_name)
     settings = reddit.get_settings(sub_name)
-    new_desc = change_sidebar_text(settings['description'], 
+    new_desc = change_sidebar_stream_status(settings['description'], 
                                    current_stream_status)
+    new_desc = change_sidebar_playing(new_desc, current_game)
     logging.debug(new_desc)
     reddit.update_settings(sub, description=new_desc)
-
-
-def update_sidebar_if_status_change(reddit, sub_name, stream_name, 
-                                    old_stream_status):
-    """Determine if a stream's status has changed and update a subreddit's 
-    sidebar text if so.
-    
-    Args:
-        reddit: A PRAW Reddit object for a moderator of the subreddit. This
-            object should be authenticated.
-        sub_name: A string representation of a subreddit's name
-        stream_name: A string representation of a twitch.tv stream's name
-        old_stream_status: A boolean value representing if the stream is
-            currently known to be online. None if the status of the stream is
-            unknown. An old_stream_status value of None ALWAYS triggers a
-            sidebar text update.
-    
-    Returns:
-        A 2-element array of boolean values. The first value is the current
-        status of the stream: True if online, False otherwise, None if unknown. 
-        The second value is True if the sidebar text was updated, and False 
-        otherwise.
-    
-    """
-    cur_stream_status = is_stream_live(stream_name)
-    if(cur_stream_status != -1):
-        if(old_stream_status is None or old_stream_status != cur_stream_status):
-            logging.info("Stream online status changed from %s to %s" 
-                         %(str(old_stream_status), str(cur_stream_status)))
-            update_sidebar(reddit, sub_name, stream_name, cur_stream_status)
-            return [cur_stream_status, True]
-    return [old_stream_status, False]

@@ -2,7 +2,7 @@
 import threading
 import time
 from flair import update_flair
-from stream_status import update_sidebar_if_status_change
+import stream_status 
 import config as CFG
 
 
@@ -59,13 +59,22 @@ class StreamStatusThread(threading.Thread):
     
     def run(self):
         """On a configurable update interval, update a subreddit's sidebar text
-        based on stream status if appropriate."""
-        stream_status = None
+        based on stream status and game if appropriate."""
+        cur_stream_status = None
+        current_game = None
         while(True):
-            stream_status = update_sidebar_if_status_change(self.reddit, 
-                                                            self.subreddit, 
-                                                            self.stream_name, 
-                                                            stream_status)[0]
+            stream_obj = stream_status.get_stream_details(self.stream_name)
+            if(stream_obj is not None and stream_obj != -1):
+                new_stream_status = stream_status.is_stream_online(stream_obj)
+                new_game = stream_status.which_game_playing(stream_obj)
+                if(stream_status.should_update_sidebar(cur_stream_status, 
+                                                       new_stream_status, 
+                                                       current_game, 
+                                                       new_game)):
+                    stream_status.update_sidebar(self.reddit, self.subreddit, 
+                                                 self.stream_name, 
+                                                 new_stream_status, 
+                                                 new_game)
             time.sleep(self.update_interval)
 
 
