@@ -1,6 +1,7 @@
 """Define threads to perform specific bot tasks"""
 import threading
 import time
+import logging
 from flair import update_flair
 import stream_status 
 import config as CFG
@@ -64,9 +65,11 @@ class StreamStatusThread(threading.Thread):
         current_game = None
         while(True):
             stream_obj = stream_status.get_stream_details(self.stream_name)
-            if(stream_obj is not None and stream_obj != -1):
+            if(stream_obj != -1):
                 new_stream_status = stream_status.is_stream_online(stream_obj)
+                logging.debug("Got new stream status: %s" % str(new_stream_status))
                 new_game = stream_status.which_game_playing(stream_obj)
+                logging.debug("Got new game: %s" % str(new_game))
                 if(stream_status.should_update_sidebar(cur_stream_status, 
                                                        new_stream_status, 
                                                        current_game, 
@@ -75,6 +78,8 @@ class StreamStatusThread(threading.Thread):
                                                  self.stream_name, 
                                                  new_stream_status, 
                                                  new_game)
+                cur_stream_status = new_stream_status
+                current_game = new_game
             time.sleep(self.update_interval)
 
 

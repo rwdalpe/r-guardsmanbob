@@ -3,6 +3,17 @@ import json
 from praw import Reddit
 
 
+def get_logfile_name(config):
+    logfile_name_key = "LogFile"
+    if(logfile_name_key in config):
+        if(type(config[logfile_name_key]) is str):
+            return config[logfile_name_key]
+        else:
+            return None
+    else:
+        raise KeyError("Couldn't find key %s in config" % logfile_name_key)
+
+
 def get_config_obj(filename='config.json'):
     """Read a JSON file and return a configuration dictionary"""
     config_obj = None

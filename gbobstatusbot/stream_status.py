@@ -19,9 +19,7 @@ def change_sidebar_playing(desc, playing):
         currently played game
     
     """
-    match = re.search(r'\[.*\]', playing)
-    new_game = match.group(0)
-    desc = re.sub(r'\[.*\]', new_game, desc, 1)
+    desc = re.sub(r'\[.*\]', playing, desc, 1)
     return desc
 def change_sidebar_stream_status(desc, live):
     """Change sidebar text with updated stream information
@@ -96,7 +94,12 @@ def is_stream_online(stream_obj):
 
 
 def which_game_playing(stream_obj):
-    return stream_obj['status']
+    if(stream_obj is None):
+        return "[]"
+    else:
+        match = re.search(r'\[.*\]', stream_obj['status'])
+        new_game = match.group(0)
+        return new_game
 
 
 def should_update_sidebar(old_stream_status, new_stream_status, old_game, 
@@ -127,5 +130,4 @@ def update_sidebar(reddit, sub_name, stream_name, current_stream_status,
     new_desc = change_sidebar_stream_status(settings['description'], 
                                    current_stream_status)
     new_desc = change_sidebar_playing(new_desc, current_game)
-    logging.debug(new_desc)
     reddit.update_settings(sub, description=new_desc)

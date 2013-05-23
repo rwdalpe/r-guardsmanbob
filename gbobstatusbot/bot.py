@@ -11,9 +11,13 @@ def catch_interrupt_signal(signum, frame):
     sys.exit(0)
 
 
-logging.basicConfig(filename='gbobstatusbot.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
-logging.info("Logging into reddit")
 config_obj = CFG.get_config_obj()
+logfile = CFG.get_logfile_name(config_obj)
+if(logfile is not None):
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
+else:
+    logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s %(message)s')
+logging.info("Logging into reddit")
 status_thread = StreamStatusThread(config_obj)
 status_thread.start()
 flair_thread = FlairManagerThread(config_obj)
