@@ -13,7 +13,7 @@ def catch_interrupt_signal(signum, frame):
 
 config_obj = CFG.get_config_obj()
 logfile = CFG.get_logfile_name(config_obj)
-if(logfile is not None):
+if(logfile is None):
     logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s')
 else:
     logging.basicConfig(filename=logfile, level=logging.DEBUG, format='%(asctime)s %(message)s')
