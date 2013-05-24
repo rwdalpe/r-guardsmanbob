@@ -55,7 +55,7 @@ def get_stream_details(stream_name):
     logging.debug("checking if stream %s is live" % stream_name)
     try:
         twitch = urllib.request.urlopen('https://api.twitch.tv/kraken/streams/%s' 
-                                        % stream_name)
+                                        % stream_name, timeout=20)
         response = twitch.read()
     except socket.gaierror:
         logging.warning(("GAIError when accessing twitch API." 
@@ -69,12 +69,17 @@ def get_stream_details(stream_name):
         logging.warning(("URLError when accessing twitch API." 
                         "Aborting this try."))
         return -1 
+    except urllib.error.HTTPError:
+        logging.warning(("HTTPError when accessing twitch API." 
+                        "Aborting this try."))
+        return -1 
     else:
         if(twitch.status == 200):
+            logging.debug("200 OK")
             jbody = response.decode("UTF-8")
             body = json.loads(jbody)
             if(body != None):
-                twitch.close()
+                logging.debug("Retrieved body of stream details")
                 if(('stream' in body) and (type(body['stream']) is dict)):
                     stream = body['stream']
                     if(('channel' in stream) and 

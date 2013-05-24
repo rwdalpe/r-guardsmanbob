@@ -63,6 +63,7 @@ class StreamStatusThread(threading.Thread):
         based on stream status and game if appropriate."""
         cur_stream_status = None
         current_game = None
+        logging.debug("Stream Status Thread starting")
         while(True):
             stream_obj = stream_status.get_stream_details(self.stream_name)
             if(stream_obj != -1):
@@ -81,6 +82,7 @@ class StreamStatusThread(threading.Thread):
                 cur_stream_status = new_stream_status
                 current_game = new_game
             time.sleep(self.update_interval)
+        logging.debug("Stream status thread stopping")
 
 
 class FlairManagerThread(threading.Thread):
@@ -137,6 +139,8 @@ class FlairManagerThread(threading.Thread):
     def run(self):
         """On a configurable update interval, assign link flair to submissions
         on the subreddit."""
+        logging.debug("Flair management thread starting")
         while(True):
             update_flair(self.reddit, self.subreddit, self.mapping)
             time.sleep(self.update_interval)
+        logging.debug("Flair management thread stopping")
