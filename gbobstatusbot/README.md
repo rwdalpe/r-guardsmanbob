@@ -27,6 +27,7 @@ thread. The configuration should be fairly self-evident from looking at the
 file, but here are the details.
 
 ### Top-level configuration options
+* **LogFile**: The name of the logfile to write. If null, log to stdout.
 * **UserAgent**: The user-agent string for the bot, as required by the reddit API
 * **Username**
 * **Password**
