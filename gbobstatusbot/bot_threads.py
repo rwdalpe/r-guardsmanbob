@@ -3,7 +3,7 @@ import threading
 import time
 import logging
 from flair import update_flair
-import stream_status 
+import stream 
 import config as CFG
 
 
@@ -61,26 +61,19 @@ class StreamStatusThread(threading.Thread):
     def run(self):
         """On a configurable update interval, update a subreddit's sidebar text
         based on stream status and game if appropriate."""
-        cur_stream_status = None
-        current_game = None
         logging.debug("Stream Status Thread starting")
+        stream_obj = None
         while(True):
-            stream_obj = stream_status.get_stream_details(self.stream_name)
-            if(stream_obj != -1):
-                new_stream_status = stream_status.is_stream_online(stream_obj)
-                logging.debug("Got new stream status: %s" % str(new_stream_status))
-                new_game = stream_status.which_game_playing(stream_obj)
-                logging.debug("Got new game: %s" % str(new_game))
-                if(stream_status.should_update_sidebar(cur_stream_status, 
-                                                       new_stream_status, 
-                                                       current_game, 
-                                                       new_game)):
-                    stream_status.update_sidebar(self.reddit, self.subreddit, 
-                                                 self.stream_name, 
-                                                 new_stream_status, 
-                                                 new_game)
-                cur_stream_status = new_stream_status
-                current_game = new_game
+            new_stream_obj = stream.create_stream_object(self.stream_name)
+            if(new_stream_obj != None):
+                if(stream_obj != None):
+                    if(stream.should_update_sidebar(stream_obj, new_stream_obj)):
+                        stream.update_sidebar(self.reddit, self.subreddit, 
+                                              new_stream_obj)
+                else:
+                    stream.update_sidebar(self.reddit, self.subreddit, 
+                                          new_stream_obj)
+                stream_obj = new_stream_obj
             time.sleep(self.update_interval)
         logging.debug("Stream status thread stopping")
 
