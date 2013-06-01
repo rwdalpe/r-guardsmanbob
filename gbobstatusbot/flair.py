@@ -1,5 +1,6 @@
 """Manage link flair in a subreddit"""
 import logging
+from urllib.error import HTTPError
 
 
 def update_flair(reddit, sub_name, mapping):
@@ -16,12 +17,16 @@ def update_flair(reddit, sub_name, mapping):
     """
     logging.info("Updating link flair for subreddit %s" % sub_name)
     sub = reddit.get_subreddit(sub_name)
-    for p in sub.get_new(limit=None):
-        if(not p.link_flair_css_class):
-            new_flair = get_flair_by_title(mapping, p.title)
-            logging.debug("Got mapping %s for title %s" % (new_flair, p.title))
-            if(new_flair is not None):
-                p.set_flair(flair_text="", flair_css_class=new_flair)
+    try:
+        for p in sub.get_new(limit=None):
+            if(not p.link_flair_css_class):
+                new_flair = get_flair_by_title(mapping, p.title)
+                logging.debug("Got mapping %s for title %s" % (new_flair, p.title))
+                if(new_flair is not None):
+                    p.set_flair(flair_text="", flair_css_class=new_flair)
+    except HTTPError:
+        logging.warning(("Error accessing reddit to get/set flair. "
+                        "Aborting this try."))
 
 
 def get_flair_by_title(mapping, title):
