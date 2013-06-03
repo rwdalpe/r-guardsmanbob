@@ -28,6 +28,11 @@ file, but here are the details.
 
 ### Top-level configuration options
 * **LogFile**: The name of the logfile to write. If null, log to stdout.
+* **LoggingLevel**: Corresponds to a Python logging level. Should be one of the following:
+  * `"DEBUG"`
+  * `"INFO"`
+  * `"WARNING"` (default)
+  * `"ERROR"`
 * **UserAgent**: The user-agent string for the bot, as required by the reddit API
 * **Username**
 * **Password**
@@ -60,4 +65,4 @@ Usage
 
 The bot can be used by running 
 
-`python bot.py`
+`python run.py`
