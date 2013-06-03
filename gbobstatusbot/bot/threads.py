@@ -68,13 +68,13 @@ class StreamStatusThread(threading.Thread):
             if(new_stream_obj != None):
                 if(stream_obj != None):
                     if(stream.should_update_sidebar(stream_obj, 
-                                                           new_stream_obj)):
+                                                    new_stream_obj)):
                         stream.update_sidebar(self.reddit,
-                                                     self.subreddit, 
-                                                     new_stream_obj)
+                                              self.subreddit, 
+                                              new_stream_obj)
                 else:
                     stream.update_sidebar(self.reddit, self.subreddit, 
-                                                 new_stream_obj)
+                                          new_stream_obj)
                 stream_obj = new_stream_obj
             time.sleep(self.update_interval)
         logging.debug("Stream status thread stopping")
