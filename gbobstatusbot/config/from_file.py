@@ -1,9 +1,10 @@
-"""Contain utilities for interfacing with bot configuration"""
+"""Contain utilities for interfacing with bot configuration file"""
 import json
 from praw import Reddit
-
+import logging
 
 def get_logfile_name(config):
+    """Retrieve the name of the logfile to write, if any"""
     logfile_name_key = "LogFile"
     if(logfile_name_key in config):
         if(type(config[logfile_name_key]) is str):
@@ -12,6 +13,25 @@ def get_logfile_name(config):
             return None
     else:
         raise KeyError("Couldn't find key %s in config" % logfile_name_key)
+
+
+def get_logging_level(config):
+    """Get the desired level of logging. The default is WARNING if none is
+    specified."""
+    logging_level_key = "LoggingLevel"
+    if(logging_level_key in config):
+        if(type(config[logging_level_key]) is str):
+            level_str = config[logging_level_key].upper()
+            try:
+                level = getattr(logging, level_str)
+            except AttributeError:
+                raise KeyError("%s was not a valid logging level" % logging_level_key)
+            else:
+                return level
+        else:
+            return logging.WARNING
+    else:
+        raise KeyError("Couldn't find key %s in config" % logging_level_key)
 
 
 def get_config_obj(filename='config.json'):

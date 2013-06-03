@@ -1,10 +1,11 @@
-"""Manage ta subreddit's sidebar and update it with twitch.tv stream status"""
-import json
+"""Utilities for dealing with twitch.tv streams and the sidebar"""
 import logging
+import json
+import re
+import http.client
 import urllib
 import socket
-import http.client
-import re
+
 
 class Stream:
     """Encapsulation object that stores a stream's name, if it's online, and
@@ -25,41 +26,6 @@ class Stream:
         self.stream_name = stream_name
         self.stream_status = stream_status
         self.cur_playing = cur_playing
-
-
-def change_sidebar_playing_text(desc, playing):
-    """Change sidebar text to reflect the currently played game
-    
-    Args:
-        desc: A string representation of sidebar text
-        playing: A string representation of the currently played game
-    
-    Returns:
-        A string representation of sidebar text that properly represents the
-        currently played game
-    
-    """
-    desc = re.sub(r'\[.*\]', playing, desc, 1)
-    return desc
-
-
-def change_sidebar_status_text(desc, is_online):
-    """Change sidebar text with updated stream information
-    
-    Args:
-        desc: A string representation of sidebar text
-        is_online: A boolean value of if a stream is online
-    
-    Returns:
-        A string representation of sidebar text that properly represents the
-        current status of a stream
-    
-    """
-    if(is_online):
-        desc = desc.replace("OFFLINE", "ONLINE")
-    else:
-        desc = desc.replace("ONLINE", "OFFLINE")
-    return desc
 
 
 def create_stream_object(stream_name):
@@ -143,6 +109,42 @@ def get_cur_game(channel_json):
         match = re.search(r'\[.*\]', channel_json['status'])
         new_game = match.group(0) if (match != None) else "[]"
         return new_game
+
+
+def change_sidebar_playing_text(desc, playing):
+    """Change sidebar text to reflect the currently played game
+    
+    Args:
+        desc: A string representation of sidebar text
+        playing: A string representation of the currently played game
+    
+    Returns:
+        A string representation of sidebar text that properly represents the
+        currently played game
+    
+    """
+    desc = re.sub(r'\[.*\]', playing, desc, 1)
+    return desc
+
+
+def change_sidebar_status_text(desc, is_online):
+    """Change sidebar text with updated stream information
+    
+    Args:
+        desc: A string representation of sidebar text
+        is_online: A boolean value of if a stream is online
+    
+    Returns:
+        A string representation of sidebar text that properly represents the
+        current status of a stream
+    
+    """
+    if(is_online):
+        desc = desc.replace("OFFLINE", "ONLINE")
+    else:
+        desc = desc.replace("ONLINE", "OFFLINE")
+    return desc
+
 
 def should_update_sidebar(old_stream_obj, new_stream_obj):
     """Determine if stream data has changed sufficiently to trigger a sidebar

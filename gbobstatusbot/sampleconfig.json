@@ -1,5 +1,6 @@
 {
     "LogFile" : null,
+    "LoggingLevel" : "DEBUG",
     "UserAgent" : "",
     "Username" : "",
     "Password" : "", 
@@ -12,8 +13,11 @@
         "Subreddit" : "",
         "Mapping": {
             "Don't Starve" : "ds",
-            "Boblight" : "lol"
+            "Boblight" : "lol",
+            "Civ5" : "civ5",
+            "Civilization" : "civ5",
+            "Inferno" : "lilinf"
         },
-        "UpdateInterval" : 3600.0
+        "UpdateInterval" : 1800.0
     }
 }

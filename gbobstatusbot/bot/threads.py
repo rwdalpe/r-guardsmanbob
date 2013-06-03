@@ -3,7 +3,7 @@ import threading
 import time
 import logging
 from flair import update_flair
-import stream 
+from sidebar import stream
 import config as CFG
 
 
@@ -67,12 +67,14 @@ class StreamStatusThread(threading.Thread):
             new_stream_obj = stream.create_stream_object(self.stream_name)
             if(new_stream_obj != None):
                 if(stream_obj != None):
-                    if(stream.should_update_sidebar(stream_obj, new_stream_obj)):
-                        stream.update_sidebar(self.reddit, self.subreddit, 
-                                              new_stream_obj)
+                    if(stream.should_update_sidebar(stream_obj, 
+                                                           new_stream_obj)):
+                        stream.update_sidebar(self.reddit,
+                                                     self.subreddit, 
+                                                     new_stream_obj)
                 else:
                     stream.update_sidebar(self.reddit, self.subreddit, 
-                                          new_stream_obj)
+                                                 new_stream_obj)
                 stream_obj = new_stream_obj
             time.sleep(self.update_interval)
         logging.debug("Stream status thread stopping")
