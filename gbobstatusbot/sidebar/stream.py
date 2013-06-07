@@ -53,7 +53,7 @@ def create_stream_object(stream_name):
             if(('channel' in stream) and (type(stream['channel']) is dict)):
                 stream_obj.stream_status = True
                 cur_playing = get_cur_game(stream['channel'])
-                stream_obj.cur_playing = cur_playing if (cur_playing is not None) else get_cur_game_fallback(stream)
+                stream_obj.cur_playing = cur_playing if (cur_playing is not None and cur_playing != "[]") else get_cur_game_fallback(stream)
                     
         else:
             stream_obj.stream_status = False
