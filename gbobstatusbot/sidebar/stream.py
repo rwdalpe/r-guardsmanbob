@@ -52,7 +52,9 @@ def create_stream_object(stream_name):
             stream = raw_stream_obj['stream']
             if(('channel' in stream) and (type(stream['channel']) is dict)):
                 stream_obj.stream_status = True
-                stream_obj.cur_playing = get_cur_game(stream['channel'])
+                cur_playing = get_cur_game(stream['channel'])
+                stream_obj.cur_playing = cur_playing if (cur_playing is not None) else get_cur_game_fallback(stream)
+                    
         else:
             stream_obj.stream_status = False
             stream_obj.cur_playing = "[]"
@@ -99,16 +101,31 @@ def get_cur_game(channel_json):
     
     This searches for characters contained in square brackets [] and considers
     those to be the title of the currently played game (as well as other
-    relevant information). If no match is found, an empty set of brackets [] is
+    relevant information). If no match is found, None is
     returned.
     
     """
-    if(channel_json is None):
-        return "[]"
+    if(channel_json is not None):
+        if('status' in channel_json and type(channel_json['status']) is str):
+            match = re.search(r'\[.*\]', channel_json['status'])
+            new_game = match.group(0) if (match != None) else None
+            return new_game
+    return None 
+
+
+def get_cur_game_fallback(stream_json):
+    """Find the currently played game from the JSON of a stream.
+    
+    In the event that details of the currently played game cannot be found in
+    the title of the stream, this is a fallback method that tries to read the
+    'game' property of the stream JSON object to determine what game is being
+    played. If this yields no results, empty brackets [] are returned.
+    
+    """
+    if('game' in stream_json and type(stream_json['game']) is str):
+        return ''.join(('[', stream_json['game'], ']'))
     else:
-        match = re.search(r'\[.*\]', channel_json['status'])
-        new_game = match.group(0) if (match != None) else "[]"
-        return new_game
+        return "[]"
 
 
 def change_sidebar_playing_text(desc, playing):
