@@ -2,6 +2,7 @@ import time
 import signal
 import logging
 import sys
+import traceback
 import config as CFG
 from bot.threads import StreamStatusThread, FlairManagerThread
 
@@ -11,7 +12,13 @@ def catch_interrupt_signal(signum, frame):
     sys.exit(0)
 
 
+def log_uncaught_exceptions(ex_type, ex, tb):
+    logging.critical(''.join(traceback.format_tb(tb)))
+    logging.critical('{0}: {1}'.format(ex_type, ex))
+
+
 def main():
+    sys.excepthook = log_uncaught_exceptions
     config_obj = CFG.get_config_obj()
     logfile = CFG.get_logfile_name(config_obj)
     loglevel = CFG.get_logging_level(config_obj)
