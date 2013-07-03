@@ -5,6 +5,8 @@ import re
 import http.client
 import urllib
 import socket
+import requests
+import time
 
 
 class Stream:
@@ -191,9 +193,14 @@ def update_sidebar(reddit, sub_name, stream_obj):
     current_game = stream_obj.cur_playing
     logging.info("Updating sidebar for subreddit %s and stream %s" 
                  % (sub_name, stream_name))
-    sub = reddit.get_subreddit(sub_name)
-    settings = reddit.get_settings(sub_name)
-    new_desc = change_sidebar_status_text(settings['description'], 
-                                   current_stream_status)
-    new_desc = change_sidebar_playing_text(new_desc, current_game)
-    reddit.update_settings(sub, description=new_desc)
+    try:
+        sub = reddit.get_subreddit(sub_name)
+        settings = reddit.get_settings(sub_name)
+        new_desc = change_sidebar_status_text(settings['description'], 
+                                       current_stream_status)
+        new_desc = change_sidebar_playing_text(new_desc, current_game)
+        reddit.update_settings(sub, description=new_desc)
+    except (requests.exceptions.HTTPError):
+            logging.warning("HTTPError updating reddit. Waiting 2 seconds and trying again.")
+            time.sleep(2.0)
+            update_sidebar(reddit, sub_name, stream_obj)
