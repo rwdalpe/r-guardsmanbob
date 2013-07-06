@@ -5,6 +5,7 @@ import sys
 import traceback
 import config as CFG
 import threading
+import socket
 from bot.threads import StreamStatusThread, FlairManagerThread
 
 
@@ -49,6 +50,7 @@ def log_uncaught_exceptions(ex_type, ex, tb):
 def main():
     sys.excepthook = log_uncaught_exceptions
     installThreadExcepthook()
+    socket.setdefaulttimeout(20.0)
     config_obj = CFG.get_config_obj()
     logfile = CFG.get_logfile_name(config_obj)
     loglevel = CFG.get_logging_level(config_obj)
