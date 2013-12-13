@@ -111,7 +111,7 @@ def create_gbobstatusbot_reddit_instance(config):
     r = None
     if(usragnt_key in config and type(config[usragnt_key]) is str):
         useragent = config[usragnt_key]
-        r = Reddit(useragent)
+        r = Reddit(useragent, disable_update_check=True)
         if(uname_key in config and type(config[uname_key]) is str):
             username = config[uname_key]
             if(pwd_key in config and type(config[pwd_key]) is str):
