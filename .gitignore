@@ -3,4 +3,4 @@
 .pydevproject
 *.pyc
 *.log
-
+.idea

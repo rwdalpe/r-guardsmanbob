@@ -1,3 +1,4 @@
+import argparse
 import time
 import signal
 import logging
@@ -46,25 +47,44 @@ def log_uncaught_exceptions(ex_type, ex, tb):
     logging.critical(''.join(traceback.format_tb(tb)))
     logging.critical('{0}: {1}'.format(ex_type, ex))
 
+def getCommandArguments():
+    parser = argparse.ArgumentParser('Run the r-guardsmanbob moderation bot')
+    parser.add_argument('-c', '--config', dest='config', type=str,
+                        default='config.json', help='a path to the configuration file for the bot to use')
+    args = parser.parse_args()
+    return args
+
+def setUpLoggingFromConfig(config_obj):
+    logfile = CFG.get_logfile_name(config_obj)
+    loglevel = CFG.get_logging_level(config_obj)
+
+    if(logfile is None):
+        logging.basicConfig(level=loglevel, format='%(asctime)s %(message)s')
+    else:
+        logging.basicConfig(filename=logfile, level=loglevel, format='%(asctime)s %(message)s')
+
+    logging.info("Logging into reddit")
+
+def startBotThreads(config_obj):
+    status_thread = StreamStatusThread(config_obj)
+    status_thread.start()
+    flair_thread = FlairManagerThread(config_obj)
+    flair_thread.start()
 
 def main():
     sys.excepthook = log_uncaught_exceptions
     installThreadExcepthook()
     socket.setdefaulttimeout(20.0)
-    config_obj = CFG.get_config_obj()
-    logfile = CFG.get_logfile_name(config_obj)
-    loglevel = CFG.get_logging_level(config_obj)
-    if(logfile is None):
-        logging.basicConfig(level=loglevel, format='%(asctime)s %(message)s')
-    else:
-        logging.basicConfig(filename=logfile, level=loglevel, format='%(asctime)s %(message)s')
-    logging.info("Logging into reddit")
-    status_thread = StreamStatusThread(config_obj)
-    status_thread.start()
-    flair_thread = FlairManagerThread(config_obj)
-    flair_thread.start()
+
+    args = getCommandArguments()
+
+    config_obj = CFG.get_config_obj(args.config)
+
+    setUpLoggingFromConfig(config_obj)
+    startBotThreads(config_obj)
+
     signal.signal(signal.SIGINT, catch_interrupt_signal)
-    # signal.pause() # LINUX ONLY
+
     while(True):
         time.sleep(5.0)
 
