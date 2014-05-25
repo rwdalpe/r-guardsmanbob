@@ -4,10 +4,7 @@
 *.pyc
 *.log
 .idea
-<<<<<<< HEAD
-=======
 .class
 */project/
 */target/
 nbproject
->>>>>>> 4e25cab... adding the stylesheet and header to the repository
