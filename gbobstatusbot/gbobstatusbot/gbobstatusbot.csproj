@@ -30,8 +30,6 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="LICENSE" />
-    <None Include="README.md" />
     <None Include="app.config" />
   </ItemGroup>
 </Project>
