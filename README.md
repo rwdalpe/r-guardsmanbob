@@ -9,6 +9,6 @@ repository.
 Here is a list of the sub-projects of this repository with links to their README
 pages where you can find project-specific information:
 
-* [gbobstatusbot](https://github.com/rwdalpe/r-guardsmanbob/tree/master/gbobstatusbot): 
+* [gbobstatusbot](gbobstatusbot): 
 A basic reddit bot which automates certain administrative tasks 
 for the subreddit

@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gbobstatusbot", "gbobstatusbot\gbobstatusbot.csproj", "{43F2A6C2-3FE9-432A-8DF4-500A597AD232}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C17F4A36-6BD0-4AD3-BAE4-A9428C707484}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		style.css = style.css
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +19,8 @@ Global
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Debug|x86.Build.0 = Debug|x86
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Release|x86.ActiveCfg = Release|x86
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = gbobstatusbot\gbobstatusbot.csproj
