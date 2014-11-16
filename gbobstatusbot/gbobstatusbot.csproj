@@ -32,5 +32,6 @@
   <ItemGroup>
     <None Include="LICENSE" />
     <None Include="README.md" />
+    <None Include="app.config" />
   </ItemGroup>
 </Project>
