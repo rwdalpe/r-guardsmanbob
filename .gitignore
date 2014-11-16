@@ -8,6 +8,6 @@
 */project/
 */target/
 nbproject
-*/obj/
-*/bin/
+obj
+bin
 *.userprefs
