@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gbobstatusbot", "gbobstatus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gbobstatusbot.Reddit", "gbobstatusbot\gbobstatusbot.Reddit\gbobstatusbot.Reddit.csproj", "{EDEA90B1-61E5-4E9C-8167-B94DCF7F8B62}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D9940F95-B722-4F21-ADB7-A105CDA10ECF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gbobstatusbot.Reddit.Tests", "gbobstatusbot\gbobstatusbot.Reddit.Tests\gbobstatusbot.Reddit.Tests.csproj", "{688C1721-4CA7-481C-BFA3-8990D29C5F3E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -27,12 +31,17 @@ Global
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Debug|x86.Build.0 = Debug|x86
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Release|x86.ActiveCfg = Release|x86
 		{43F2A6C2-3FE9-432A-8DF4-500A597AD232}.Release|x86.Build.0 = Release|x86
+		{688C1721-4CA7-481C-BFA3-8990D29C5F3E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{688C1721-4CA7-481C-BFA3-8990D29C5F3E}.Debug|x86.Build.0 = Debug|Any CPU
+		{688C1721-4CA7-481C-BFA3-8990D29C5F3E}.Release|x86.ActiveCfg = Release|Any CPU
+		{688C1721-4CA7-481C-BFA3-8990D29C5F3E}.Release|x86.Build.0 = Release|Any CPU
 		{EDEA90B1-61E5-4E9C-8167-B94DCF7F8B62}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{EDEA90B1-61E5-4E9C-8167-B94DCF7F8B62}.Debug|x86.Build.0 = Debug|Any CPU
 		{EDEA90B1-61E5-4E9C-8167-B94DCF7F8B62}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDEA90B1-61E5-4E9C-8167-B94DCF7F8B62}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{688C1721-4CA7-481C-BFA3-8990D29C5F3E} = {D9940F95-B722-4F21-ADB7-A105CDA10ECF}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = gbobstatusbot\gbobstatusbot\gbobstatusbot.csproj
