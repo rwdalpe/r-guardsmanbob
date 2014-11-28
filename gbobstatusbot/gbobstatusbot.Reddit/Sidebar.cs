@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using RedditSharp;
+using RedditSharp.Things;
 
 namespace gbobstatusbot.Reddit
 {
@@ -10,7 +11,7 @@ namespace gbobstatusbot.Reddit
         private string redditPassword;
         private RedditSharp.Reddit reddit;
 
-        public string Subreddit { get; set; }
+        public string Subreddit { get; private set; }
 
         public Sidebar (string username, string password, string subreddit)
         {
@@ -22,7 +23,8 @@ namespace gbobstatusbot.Reddit
         }
 
         public string CurrentText() {
-
+            RedditSharp.Things.Subreddit sr = reddit.GetSubreddit (Subreddit);
+            return sr.Description;
         }
     }
 }
