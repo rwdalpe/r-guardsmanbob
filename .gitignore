@@ -12,3 +12,4 @@ obj
 bin
 *.userprefs
 packages/
+*/*.Tests/app.config
