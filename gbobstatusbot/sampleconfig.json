@@ -1,23 +1,27 @@
 {
-    "LogFile" : null,
-    "LoggingLevel" : "DEBUG",
-    "UserAgent" : "",
-    "Username" : "",
-    "Password" : "", 
-    "StreamStatusBot": {
-        "StreamName" : "",
-        "Subreddit" : "",
-        "UpdateInterval" : 10.0
-    },
-    "FlairBot": {
-        "Subreddit" : "",
-        "Mapping": {
-            "Don't Starve" : "ds",
-            "Boblight" : "lol",
-            "Civ5" : "civ5",
-            "Civilization" : "civ5",
-            "Inferno" : "lilinf"
+    "LogFile": null,
+    "LoggingLevel": "DEBUG",
+    "UserAgent": "",
+    "Username": "",
+    "Password": "",
+    "ClientID": "",
+    "ClientSecret": "",
+    "BotThreads": {
+        "StreamStatusBot": {
+            "StreamName": "",
+            "Subreddit": "",
+            "UpdateInterval": 10.0
         },
-        "UpdateInterval" : 1800.0
+        "FlairBot": {
+            "Subreddit": "",
+            "Mapping": {
+                "Don't Starve": "ds",
+                "Boblight": "lol",
+                "Civ5": "civ5",
+                "Civilization": "civ5",
+                "Inferno": "lilinf"
+            },
+            "UpdateInterval": 1800.0
+        }
     }
 }

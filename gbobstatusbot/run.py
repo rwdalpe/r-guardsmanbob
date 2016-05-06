@@ -7,7 +7,7 @@ import traceback
 import config as CFG
 import threading
 import socket
-from bot.threads import StreamStatusThread, FlairManagerThread
+from gbobstatusbot.config.registrations import get_bot_broker
 
 
 def catch_interrupt_signal(signum, frame):
@@ -29,9 +29,11 @@ def installThreadExcepthook():
     
     """
     init_old = threading.Thread.__init__
+
     def init(self, *args, **kwargs):
         init_old(self, *args, **kwargs)
         run_old = self.run
+
         def run_with_except_hook(*args, **kw):
             try:
                 run_old(*args, **kw)
@@ -39,13 +41,16 @@ def installThreadExcepthook():
                 raise
             except:
                 sys.excepthook(*sys.exc_info())
+
         self.run = run_with_except_hook
+
     threading.Thread.__init__ = init
 
 
 def log_uncaught_exceptions(ex_type, ex, tb):
     logging.critical(''.join(traceback.format_tb(tb)))
     logging.critical('{0}: {1}'.format(ex_type, ex))
+
 
 def getCommandArguments():
     parser = argparse.ArgumentParser('Run the r-guardsmanbob moderation bot')
@@ -54,22 +59,23 @@ def getCommandArguments():
     args = parser.parse_args()
     return args
 
-def setUpLoggingFromConfig(config_obj):
-    logfile = CFG.get_logfile_name(config_obj)
-    loglevel = CFG.get_logging_level(config_obj)
 
-    if(logfile is None):
+def setUpLoggingFromConfig(config_obj):
+    logfile = config_obj.LogFile()
+    loglevel = CFG.get_logging_loglevel(config_obj)
+
+    if (logfile is None):
         logging.basicConfig(level=loglevel, format='%(asctime)s %(message)s')
     else:
         logging.basicConfig(filename=logfile, level=loglevel, format='%(asctime)s %(message)s')
 
-    logging.info("Logging into reddit")
 
-def startBotThreads(config_obj):
-    status_thread = StreamStatusThread(config_obj)
-    status_thread.start()
-    flair_thread = FlairManagerThread(config_obj)
-    flair_thread.start()
+def get_bot_threads(config_obj, bot_broker):
+    bot_threads = []
+    for bot_thread_key, bot_thread_value in config_obj.BotThreads:
+        bot_threads.append(bot_broker.broker(bot_thread_key, config_obj))
+    return bot_threads
+
 
 def main():
     sys.excepthook = log_uncaught_exceptions
@@ -81,12 +87,19 @@ def main():
     config_obj = CFG.get_config_obj(args.config)
 
     setUpLoggingFromConfig(config_obj)
-    startBotThreads(config_obj)
+
+    bot_broker = get_bot_broker()
+
+    bot_threads = get_bot_threads(config_obj, bot_broker)
+
+    for bot_thread in bot_threads:
+        bot_thread.start()
 
     signal.signal(signal.SIGINT, catch_interrupt_signal)
 
-    while(True):
+    while (True):
         time.sleep(5.0)
+
 
 if __name__ == "__main__":
     main()

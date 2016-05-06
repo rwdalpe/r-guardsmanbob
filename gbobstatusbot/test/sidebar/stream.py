@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from sidebar.stream import create_stream_object, Stream
+from gbobstatusbot.sidebar.stream import create_stream_object, Stream
 
 
 class MockResponse:
