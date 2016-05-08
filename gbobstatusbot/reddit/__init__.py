@@ -1,6 +1,6 @@
 from praw import Reddit
 
-from reddit.reddit_wrapper import RedditWrapper, PasswordGrantRedditWrapperDecorator
+from gbobstatusbot.reddit.reddit_wrapper import RedditWrapper, PasswordGrantRedditWrapperDecorator
 
 
 def get_reddit_wrapper(config_obj):

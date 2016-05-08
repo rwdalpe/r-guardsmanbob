@@ -2,7 +2,10 @@
 import logging
 import threading
 
+import time
 from reddit import get_reddit_wrapper
+
+from gbobstatusbot.sidebar import stream
 
 
 class StreamStatusThread(threading.Thread):
@@ -10,46 +13,37 @@ class StreamStatusThread(threading.Thread):
     twitch.tv stream"""
 
     def __init__(self, config):
-        # self.reddit = CFG.create_gbobstatusbot_reddit_instance(config)
-        # toplevel = "StreamStatusBot"
-        # if(toplevel in config and type(config[toplevel]) is dict):
-        #     config = config[toplevel]
-        #     self.update_interval = CFG.get_update_interval(config)
-        #     self.subreddit = CFG.get_subreddit(config)
-        #     self.stream_name = self.get_stream_name(config)
-        # else:
-        #     raise KeyError("Couldn't find key %s in config" % toplevel)
         threading.Thread.__init__(self)
         self.daemon = True
-        self.config = config
-
-    def get_stream_name(self, config):
-        stream_name_key = "StreamName"
-        if (stream_name_key in config and type(config[stream_name_key]) is str):
-            return config[stream_name_key]
-        else:
-            raise KeyError("Couldn't find key %s in config" % stream_name_key)
+        self._config = config
+        (self._stream_name, self._subreddit_name, self._update_interval) = self._extract_config_details(self._config)
 
     def run(self):
         logging.debug("Stream Status Thread starting")
-        reddit_wrapper = get_reddit_wrapper(self.config)
-        print(reddit_wrapper.get_username())
-        # stream_obj = None
-        # while(True):
-        #     new_stream_obj = stream.create_stream_object(self.stream_name)
-        #     if(new_stream_obj != None):
-        #         if(stream_obj != None):
-        #             if(stream.should_update_sidebar(stream_obj,
-        #                                             new_stream_obj)):
-        #                 stream.update_sidebar(self.reddit,
-        #                                       self.subreddit,
-        #                                       new_stream_obj)
-        #         else:
-        #             stream.update_sidebar(self.reddit, self.subreddit,
-        #                                   new_stream_obj)
-        #         stream_obj = new_stream_obj
-        #     time.sleep(self.update_interval)
+        reddit_wrapper = get_reddit_wrapper(self._config)
+        stream_obj = None
+        while (True):
+            new_stream_obj = stream.create_stream_object(self._stream_name)
+            if (new_stream_obj != None):
+                if (stream_obj != None):
+                    if (stream.should_update_sidebar(stream_obj,
+                                                     new_stream_obj)):
+                        stream.update_sidebar(reddit_wrapper,
+                                              self._subreddit_name,
+                                              new_stream_obj)
+                else:
+                    stream.update_sidebar(reddit_wrapper, self._subreddit_name,
+                                          new_stream_obj)
+                stream_obj = new_stream_obj
+            time.sleep(self._update_interval)
         logging.debug("Stream status thread stopping")
+
+    def _extract_config_details(self, config):
+        config_details = config.BotThreads.StreamStatusBot()
+        stream_name = config_details["StreamName"]
+        subreddit_name = config_details["Subreddit"]
+        update_interval = config_details["UpdateInterval"]
+        return (stream_name, subreddit_name, update_interval)
 
 
 class FlairManagerThread(threading.Thread):

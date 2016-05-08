@@ -12,6 +12,7 @@ import time
 class Stream:
     """Encapsulation object that stores a stream's name, if it's online, and
     the name of the game currently being played."""
+
     def __init__(self, stream_name, stream_status=None, cur_playing=None):
         """Create a new Stream object
         
@@ -46,17 +47,18 @@ def create_stream_object(stream_name):
     """
     stream_obj = None
     raw_stream_obj = get_raw_stream_obj(stream_name)
-    if(raw_stream_obj != None):
+    if (raw_stream_obj != None):
         stream_obj = Stream(stream_name)
         logging.debug("Retrieved body of raw stream obj")
-        if(('stream' in raw_stream_obj) and 
-           (type(raw_stream_obj['stream']) is dict)):
+        if (('stream' in raw_stream_obj) and
+                (type(raw_stream_obj['stream']) is dict)):
             stream = raw_stream_obj['stream']
-            if(('channel' in stream) and (type(stream['channel']) is dict)):
+            if (('channel' in stream) and (type(stream['channel']) is dict)):
                 stream_obj.stream_status = True
                 cur_playing = get_cur_game(stream['channel'])
-                stream_obj.cur_playing = cur_playing if (cur_playing is not None and cur_playing != "[]") else get_cur_game_fallback(stream)
-                    
+                stream_obj.cur_playing = cur_playing if (
+                    cur_playing is not None and cur_playing != "[]") else get_cur_game_fallback(stream)
+
         else:
             stream_obj.stream_status = False
             stream_obj.cur_playing = "[]"
@@ -75,19 +77,19 @@ def get_raw_stream_obj(stream_name):
                                         % stream_name, timeout=20)
         response = twitch.read()
     except socket.gaierror:
-        logging.warning(("GAIError when accessing twitch API. " 
-                        "Aborting this try."))
+        logging.warning(("GAIError when accessing twitch API. "
+                         "Aborting this try."))
     except http.client.IncompleteRead:
-        logging.warning(("Unable to finish reading request. " 
-                        "Aborting this try."))
+        logging.warning(("Unable to finish reading request. "
+                         "Aborting this try."))
     except urllib.error.URLError:
-        logging.warning(("URLError when accessing twitch API. " 
-                        "Aborting this try."))
+        logging.warning(("URLError when accessing twitch API. "
+                         "Aborting this try."))
     except urllib.error.HTTPError:
-        logging.warning(("HTTPError when accessing twitch API. " 
-                        "Aborting this try."))
+        logging.warning(("HTTPError when accessing twitch API. "
+                         "Aborting this try."))
     else:
-        if(twitch.status == 200):
+        if (twitch.status == 200):
             logging.debug("200 OK")
             jbody = response.decode("UTF-8")
             body = json.loads(jbody)
@@ -98,7 +100,7 @@ def get_raw_stream_obj(stream_name):
         return raw_stream_obj
 
 
-def get_cur_game(channel_json):
+def get_cur_game(channel_dict):
     """Find the currently played game from the title of a stream.
     
     This searches for characters contained in square brackets [] and considers
@@ -107,15 +109,15 @@ def get_cur_game(channel_json):
     returned.
     
     """
-    if(channel_json is not None):
-        if('status' in channel_json and type(channel_json['status']) is str):
-            match = re.search(r'\[.*\]', channel_json['status'])
+    if (channel_dict is not None):
+        if ('status' in channel_dict and type(channel_dict['status']) is str):
+            match = re.search(r'\[.*\]', channel_dict['status'])
             new_game = match.group(0) if (match != None) else None
             return new_game
-    return None 
+    return None
 
 
-def get_cur_game_fallback(stream_json):
+def get_cur_game_fallback(stream_dict):
     """Find the currently played game from the JSON of a stream.
     
     In the event that details of the currently played game cannot be found in
@@ -124,8 +126,8 @@ def get_cur_game_fallback(stream_json):
     played. If this yields no results, empty brackets [] are returned.
     
     """
-    if('game' in stream_json and type(stream_json['game']) is str):
-        return ''.join(('[', stream_json['game'], ']'))
+    if ('game' in stream_dict and type(stream_dict['game']) is str):
+        return ''.join(('[', stream_dict['game'], ']'))
     else:
         return "[]"
 
@@ -158,7 +160,7 @@ def change_sidebar_status_text(desc, is_online):
         current status of a stream
     
     """
-    if(is_online):
+    if (is_online):
         desc = desc.replace("OFFLINE", "ONLINE")
     else:
         desc = desc.replace("ONLINE", "OFFLINE")
@@ -172,35 +174,25 @@ def should_update_sidebar(old_stream_obj, new_stream_obj):
     old_game = old_stream_obj.cur_playing
     new_stream_status = new_stream_obj.stream_status
     new_game = new_stream_obj.cur_playing
-    return ((old_stream_status is None or old_game is None) or 
-            old_stream_status != new_stream_status or 
+    return ((old_stream_status is None or old_game is None) or
+            old_stream_status != new_stream_status or
             old_game != new_game)
 
 
 def update_sidebar(reddit, sub_name, stream_obj):
-    """Update a subreddit's sidebar text.
-    
-    Args:
-        reddit: A PRAW Reddit object for a moderator of the subreddit. This
-            object should be authenticated.
-        sub_name: A string representation of a subreddit's name
-        stream_obj: a Stream object containing information about the stream used
-            for updating
-    
-    """
     stream_name = stream_obj.stream_name
     current_stream_status = stream_obj.stream_status
     current_game = stream_obj.cur_playing
-    logging.info("Updating sidebar for subreddit %s and stream %s" 
+    logging.info("Updating sidebar for subreddit %s and stream %s"
                  % (sub_name, stream_name))
     try:
         sub = reddit.get_subreddit(sub_name)
         settings = reddit.get_settings(sub_name)
-        new_desc = change_sidebar_status_text(settings['description'], 
-                                       current_stream_status)
+        new_desc = change_sidebar_status_text(settings['description'],
+                                              current_stream_status)
         new_desc = change_sidebar_playing_text(new_desc, current_game)
-        reddit.update_settings(sub, description=new_desc)
+        reddit.edit_wiki_page(sub, "config/sidebar", new_desc)
     except (requests.exceptions.HTTPError):
-            logging.warning("HTTPError updating reddit. Waiting 2 seconds and trying again.")
-            time.sleep(2.0)
-            update_sidebar(reddit, sub_name, stream_obj)
+        logging.warning("HTTPError updating reddit. Waiting 2 seconds and trying again.")
+        time.sleep(2.0)
+        update_sidebar(reddit, sub_name, stream_obj)
