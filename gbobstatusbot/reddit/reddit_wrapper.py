@@ -38,6 +38,9 @@ class RedditWrapper:
     def edit_wiki_page(self, subreddit_name, page, content, reason=''):
         return self._r.edit_wiki_page(subreddit_name, page, content, reason)
 
+    def get_subreddit(self, subreddit_name):
+        return self._r.get_subreddit(subreddit_name)
+
 
 class PasswordGrantRedditWrapperDecorator(RedditWrapper):
     def __init__(self, decorated, config_obj):
@@ -63,6 +66,10 @@ class PasswordGrantRedditWrapperDecorator(RedditWrapper):
     def edit_wiki_page(self, subreddit_name, page, content, reason=''):
         self.__set_access_token()
         return self.decorated.edit_wiki_page(subreddit_name, page, content, reason)
+
+    def get_subreddit(self, subreddit_name):
+        self.__set_access_token()
+        return self.decorated.get_subreddit(subreddit_name)
 
     def __set_access_token(self):
         token = self.__get_access_token(self.config_obj)

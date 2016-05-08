@@ -18,6 +18,8 @@ import logging
 import threading
 
 import time
+
+from gbobstatusbot.flair.update import update_flair
 from gbobstatusbot.reddit import get_reddit_wrapper
 
 from gbobstatusbot.sidebar import stream
@@ -63,18 +65,10 @@ class StreamStatusThread(threading.Thread):
 
 class FlairManagerThread(threading.Thread):
     def __init__(self, config):
-        # self.reddit = CFG.create_gbobstatusbot_reddit_instance(config)
-        # toplevel = "FlairBot"
-        # if(toplevel in config and type(config[toplevel]) is dict):
-        #     config = config[toplevel]
-        #     self.update_interval = CFG.get_update_interval(config)
-        #     self.subreddit = CFG.get_subreddit(config)
-        #     self.mapping = self.get_mapping(config)
-        # else:
-        #     raise KeyError("Couldn't find key %s in config" % toplevel)
         threading.Thread.__init__(self)
         self.daemon = True
-        self.config = config
+        self._config = config
+        (self._subreddit_name, self._update_interval, self._mapping) = self._extract_config_details(self._config)
 
     def get_mapping(self, config):
         mapping_key = "Mapping"
@@ -85,9 +79,16 @@ class FlairManagerThread(threading.Thread):
 
     def run(self):
         logging.debug("Flair management thread starting")
-        reddit_wrapper = get_reddit_wrapper(self.config)
-        print(reddit_wrapper.get_username())
-        # while(True):
-        #     update_flair(self.reddit, self.subreddit, self.mapping)
-        #     time.sleep(self.update_interval)
+        reddit_wrapper = get_reddit_wrapper(self._config)
+        while(True):
+            update_flair(reddit_wrapper, self._subreddit_name, self._mapping)
+            time.sleep(self._update_interval)
         logging.debug("Flair management thread stopping")
+
+    def _extract_config_details(self, config):
+        config_details = config.BotThreads.FlairBot()
+        subreddit_name = config_details["Subreddit"]
+        update_interval = config_details["UpdateInterval"]
+        mapping = config_details["Mapping"]
+        return (subreddit_name, update_interval, mapping)
+
